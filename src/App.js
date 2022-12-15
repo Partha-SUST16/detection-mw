@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { HashRouter as Router, Route, Routes, Link } from "react-router-dom";
+import { HashRouter as Router, Route, Routes, Link, useLocation  } from "react-router-dom";
 import WebCalibration from "./web-calibration.js";
 // import {
 //   Router,
@@ -12,7 +12,7 @@ import WebCalibration from "./web-calibration.js";
 
 function App() {
   const [url, setUrl] = useState("");
-  const [isOnMeet, setIsOnMeet] = useState(false);
+  const [isOnMeet, setIsOnMeet] = useState(true);
   const [isOnCalibrationPage, setisOnCalibrationPage] = useState(false);
   const [email, setEmail] = useState("");
   useEffect(() => {
@@ -30,6 +30,10 @@ function App() {
           }
         }
       });
+    // eslint-disable-next-line no-undef
+    if(!chrome.tabs) {
+      setisOnCalibrationPage(true);
+    }
   });
   // useEffect(()=>{
   //   const existingEmail = localStorage.getItem('Email');

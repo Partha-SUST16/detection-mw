@@ -1,4 +1,4 @@
-body {
+.test {
     min-width:600px!important;
 }
 
@@ -69,11 +69,11 @@ li {
 }
 
 /* Calibration button styling */
-.Calibration{
+.calibration{
     width: 20px;
     height: 20px;
-    -webkit-border-radius: 25px;
-    -moz-border-radius: 25px;
+    /* -webkit-border-radius: 25px; */
+    /* -moz-border-radius: 25px; */
     border-radius: 25px;
     background-color: red;
     opacity: 0.2;
