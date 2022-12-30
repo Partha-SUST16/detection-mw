@@ -18,7 +18,21 @@ class WebCalibration extends React.Component {
     await webgazer.setRegression('ridge')
       .setGazeListener(function (data, clock) {
         if (data) {
-          console.log(JSON.stringify(data.x) + ' ' + JSON.stringify(data.y));
+          // console.log(JSON.stringify(data.x) + ' ' + JSON.stringify(data.y));
+
+          let timeStamp = Date.now();
+          let dataText = `${data.x},${data.y},${timeStamp}`;
+          //Timestamp	StimulusName  EventSource	GazeX GazeY GazeLeftx	GazeRightx	GazeLefty	GazeRighty	PupilLeft	PupilRight	FixationSeq	SaccadeSeq	Blink	GazeAOI
+          try {
+            //console.log(JSON.stringify(data));
+            if (data.eyeFeatures.left.blink) {
+              dataText = `${timeStamp},'stimulus_0','ET',${data.x},${data.y},${data.gazeLeft.x},${data.gazeRight.x},${data.gazeLeft.y},${data.gazeRight.y},${0.0},${0.0},${-1},${-1},${1},${-1}`
+            } else
+              dataText = `${timeStamp},'stimulus_0','ET',${data.x},${data.y},${data.gazeLeft.x},${data.gazeRight.x},${data.gazeLeft.y},${data.gazeRight.y},${data.eyeFeatures.left.pupil[1]},${data.eyeFeatures.left.pupil[1]},${-1},${-1},${0},${-1}`;
+            console.log(dataText);
+          } catch (error) {
+            console.log(`eyeBlink: ${data.eyeFeatures.left.blink}`);
+          }
         }
       }).saveDataAcrossSessions(true)
       .begin();
@@ -118,7 +132,7 @@ class WebCalibration extends React.Component {
       this.CalibrationPoints[id] = 0;
     }
     let isMorethanFive = true;
-    if (this.CalibrationPoints[id]<5) {
+    if (this.CalibrationPoints[id] < 5) {
       this.CalibrationPoints[id]++;
       isMorethanFive = false;
     }
@@ -128,7 +142,7 @@ class WebCalibration extends React.Component {
     } else if (this.CalibrationPoints[id] < 5) {
       var opacity = 0.2 * this.CalibrationPoints[id] + 0.2;
       document.getElementById(id).style.opacity = opacity;
-    } 
+    }
     if (this.PointCalibrate === 8) {
       document.getElementById("Pt5").style.visibility = 'visible';
     }
@@ -238,7 +252,7 @@ class WebCalibration extends React.Component {
   /**
   * This function clears the calibration buttons memory
   */
-  ClearCalibration=()=> {
+  ClearCalibration = () => {
     // Clear data from WebGazer
     var points = document.getElementsByClassName("calibration");
     for (let i = 0; i < points.length; i++) {
@@ -257,10 +271,10 @@ class WebCalibration extends React.Component {
     this.PointCalibrate = 0;
   }
 
-  sleep=(time)=> {
+  sleep = (time) => {
     return new Promise((resolve) => setTimeout(resolve, time));
   }
- 
+
   onCloseModal = () => {
     this.setState({ openModal: false })
   }
