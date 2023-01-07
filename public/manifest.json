@@ -12,8 +12,7 @@
     "48": "logo192.png",
     "128": "logo192.png"
   },
-  "permissions": ["storage", "activeTab", "scripting", "tabs", "alarms", "identity","scripting"],
-  "host_permissions": ["*://meet.google.com/*"],
+  "permissions": ["storage", "activeTab", "tabs", "alarms", "identity"],
   "content_security_policy":  "script-src 'self'  'unsafe-eval' ; object-src 'self'  'unsafe-eval' ; script-src-elem 'self' 'unsafe-eval'  'unsafe-inline';"
 
 }

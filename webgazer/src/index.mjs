@@ -241,11 +241,15 @@ async function getPrediction(regModelIndex) {
   // [20200617 xk] TODO: this call should be made async somehow. will take some work.
   latestEyeFeatures = await getPupilFeatures(videoElementCanvas, videoElementCanvas.width, videoElementCanvas.height);
   var pupils = webgazer.pupil.getPupils(latestEyeFeatures);
-  if (pupils != null) {
-    latestEyeFeatures.left.blink = pupils.left.blink;
-    latestEyeFeatures.left.pupil = pupils.left.pupil;
-    latestEyeFeatures.right.blink = pupils.right.blink; 
-    latestEyeFeatures.right.pupil = pupils.right.pupil;
+  try {
+    if (pupils != null) {
+      latestEyeFeatures.left.blink = pupils.left.blink;
+      latestEyeFeatures.left.pupil = pupils.left.pupil;
+      latestEyeFeatures.right.blink = pupils.right.blink; 
+      latestEyeFeatures.right.pupil = pupils.right.pupil;
+    }
+  } catch (error) {
+    
   }
   if (regs.length === 0) {
     console.log('regression not set, call setRegression()');
