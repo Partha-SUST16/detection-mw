@@ -17,7 +17,7 @@ class Tracking extends React.Component {
     };
     this.getDataFromLocalStorage.bind(this);
     this.startTracking.bind(this);
-    this.sendDataToBackEnd.bind(this);
+    this.addData.bind(this);
   }
   getDataFromLocalStorage() {
     const existingEmail = localStorage.getItem("Email");
@@ -41,35 +41,24 @@ class Tracking extends React.Component {
   stopTracking = () => {
     if (this.state.isPaused) {
       this.setState({ isPaused: false });
-      // this.isPaused = false;
       webgazer.resume();
     } else {
       webgazer.pause();
       this.setState({ isPaused: true });
-      // this.isPaused = true;
     }
   };
   sleep(time) {
     return new Promise((resolve) => setTimeout(resolve, time));
   }
-  sendDataToBackEnd(dataText) {
-    if (!dataText) return;
-    this.dataToBeSent.data.push(dataText);
-    this.sleep(5000).then(async () => {
-      console.log(`dataSize: ${this.dataToBeSent.data.length}`);
-      await fetch("https://5e23-103-31-155-246.ap.ngrok.io/docs", {
-        method: "POST",
-        body: JSON.stringify(this.dataToBeSent),
-      }).then((res) => {
-        console.log(res);
-        this.dataToBeSent.data = [];
-      });
-    });
+  addData(data) {
+    if (!data) return;
+    this.dataToBeSent.data.push(data);
   }
   startTracking() {
     const self = this;
     debugger
     try {
+      this.sendDataToBackend();
       webgazer
         .setRegression("ridge")
         .setGazeListener(function (data, elapsedTime) {
@@ -89,7 +78,7 @@ class Tracking extends React.Component {
               },${0.0},${0.0},${-1},${-1},${1},${-1}`;
             } else dataText = `${timeStamp},'stimulus_0','ET',${data.x},${data.y},${data.gazeLeft.x},${data.gazeRight.x},${data.gazeLeft.y},${data.gazeRight.y},${data.eyeFeatures.left.pupil[1]},${data.eyeFeatures.left.pupil[1]},${-1},${-1},${0},${-1}`;
             console.log(dataText);
-            self.sendDataToBackEnd(dataText);
+            self.addData(self.transformToObject(data));
           } catch (e) {
             console.log(`eyeBlink: ${data.eyeFeatures.left.blink}`);
           }
@@ -105,6 +94,53 @@ class Tracking extends React.Component {
       console.log(error);
     }
   }
+  transformToObject=(data)=>{
+    //Timestamp	StimulusName  EventSource	GazeX GazeY GazeLeftx	GazeRightx	GazeLefty	GazeRighty	
+    // PupilLeft	PupilRight	FixationSeq	SaccadeSeq	Blink	GazeAOI
+    const obj = {};
+    obj.Timestamp = Date.now();
+    obj.GazeX = data.x;
+    obj.GazeY = data.y;
+    obj.GazeLeftx = data.gazeLeft.x;
+    obj.GazeLefty = data.gazeLeft.y;
+    obj.GazeRightx = data.gazeRight.x;
+    obj.GazeRighty = data.gazeRight.y;
+    obj.PupilLeft = 0.0;
+    obj.PupilRight = 0.0;
+    obj.FixationSeq = -1;
+    obj.SaccadeSeq = -1;
+    obj.Blink = 1;
+    obj.student_id = 1;
+    obj.GazeAOI = -1;
+    if (!data.eyeFeatures.left.blink) {
+      obj.PupilLeft = data.eyeFeatures.left.pupil[1];
+      obj.PupilRight = data.eyeFeatures.right.pupil[1];
+      obj.Blink = 0;
+    }
+    return obj;
+  }
+  sendDataToBackend=()=> {
+    setInterval(async () => {
+      try {
+        await fetch("https://2716-27-147-234-160.in.ngrok.io/gaze", {
+          method: "POST",
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify(this.dataToBeSent.data),
+        }).then((res) => {
+          console.log(res);
+          if (res.ok)
+            this.dataToBeSent.data = [];
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }, 5000);
+  }
+
   render() {
     return (
       <>
