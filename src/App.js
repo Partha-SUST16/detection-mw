@@ -19,6 +19,7 @@ function App() {
   const [gender, setGender] = useState("M");
   const [doesWearGlass, setGlass] = useState("false");
   const [isFormValid, setValidity] = useState(true);
+
   useEffect(() => {
     const queryInfo = { active: true, currentWindow: true };
     // eslint-disable-next-line no-undef
@@ -34,12 +35,18 @@ function App() {
             setisOnCalibrationPage(true);
             console.log(`is on meet.com ${false}`);
           }
+          // if(url && url.includes("meet.google.com")) {
+          //   console.log('message')
+          //   // eslint-disable-next-line no-undef
+            
+          // }
         }
       });
     // eslint-disable-next-line no-undef
     if (!chrome.tabs) {
       setisOnCalibrationPage(true);
     }
+    
   }, []);
   useEffect(() => {
     const existingEmail = localStorage.getItem("Email");

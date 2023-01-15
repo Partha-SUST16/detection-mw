@@ -15,6 +15,7 @@ class Tracking extends React.Component {
       doesWearGlass: "",
       data: null,
     };
+    this.popupInterval = null;
     this.getDataFromLocalStorage.bind(this);
     this.startTracking.bind(this);
     this.addData.bind(this);
@@ -31,9 +32,12 @@ class Tracking extends React.Component {
     this.dataToBeSent.data = [];
   }
   async componentDidMount() {
-    // this.isPaused = false;
     this.getDataFromLocalStorage();
     this.startTracking();
+    this.popupInterval = this.setRandomInterval(this.sendQueryForPopUP, 5000, 10000); 
+  }
+  componentWillUnmount() {
+    this.popupInterval?.clear();
   }
   shouldComponentUpdate() {
     return true;
@@ -56,9 +60,8 @@ class Tracking extends React.Component {
   }
   startTracking() {
     const self = this;
-    debugger
     try {
-      this.sendDataToBackend();
+      //this.sendDataToBackend();
       webgazer
         .setRegression("ridge")
         .setGazeListener(function (data, elapsedTime) {
@@ -95,8 +98,6 @@ class Tracking extends React.Component {
     }
   }
   transformToObject=(data)=>{
-    //Timestamp	StimulusName  EventSource	GazeX GazeY GazeLeftx	GazeRightx	GazeLefty	GazeRighty	
-    // PupilLeft	PupilRight	FixationSeq	SaccadeSeq	Blink	GazeAOI
     const obj = {};
     obj.Timestamp = Date.now();
     obj.GazeX = data.x;
@@ -119,6 +120,57 @@ class Tracking extends React.Component {
     }
     return obj;
   }
+  setRandomInterval = (intervalFunction, minDelay, maxDelay) => {
+    let timeout;
+  
+    const runInterval = () => {
+      const timeoutFunction = () => {
+        intervalFunction();
+        runInterval();
+      };
+  
+      const delay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
+  
+      timeout = setTimeout(timeoutFunction, delay);
+    };
+  
+    runInterval();
+  
+    return {
+      clear() { clearTimeout(timeout) },
+    };
+  };
+  sendQueryForPopUP = ()=>{
+    // eslint-disable-next-line no-undef
+    chrome.tabs.query({active: true, currentWindow: true}, async(tabs) => {
+      if(tabs.length === 0) {
+        console.log("no active tab");
+        return;
+      }
+      // eslint-disable-next-line no-undef
+      const port = chrome.tabs.connect(tabs[0].id, {name: "openModal"});
+      // eslint-disable-next-line no-undef
+      port.onMessage.addListener((msg)=>{
+        console.log(`received response ${JSON.stringify(msg)}`);
+      })
+      // eslint-disable-next-line no-undef
+      port.postMessage({message: "openModal"});
+      
+      // const resposne = await chrome.tabs.sendMessage(tabs[0]?.id, {message: "openModal"});
+      // console.log(`received response ${resposne}`);
+      // chrome.tabs.sendMessage(tabs[0]?.id, {
+      //     message:"fuuuuuuuukkkkkk"
+      // }, 
+      // (response) => {
+      //     if(!response) {
+      //         console.log("Something went wrong!");
+      //         return;
+      //     }
+      //     console.log("Got response");
+      //     console.log(response);
+      // });
+  });
+  }
   sendDataToBackend=()=> {
     setInterval(async () => {
       try {
@@ -135,6 +187,7 @@ class Tracking extends React.Component {
           if (res.ok)
             this.dataToBeSent.data = [];
         });
+
       } catch (error) {
         console.log(error);
       }
