@@ -113,6 +113,7 @@ class Tracking extends React.Component {
     obj.Blink = 1;
     obj.student_id = 1;
     obj.GazeAOI = -1;
+    obj.isMindWandered = false;
     if (!data.eyeFeatures.left.blink) {
       obj.PupilLeft = data.eyeFeatures.left.pupil[1];
       obj.PupilRight = data.eyeFeatures.right.pupil[1];
@@ -150,11 +151,32 @@ class Tracking extends React.Component {
       // eslint-disable-next-line no-undef
       const port = chrome.tabs.connect(tabs[0].id, {name: "openModal"});
       // eslint-disable-next-line no-undef
-      port.onMessage.addListener((msg)=>{
-        console.log(`received response ${JSON.stringify(msg)}`);
+      port.onMessage.addListener((userChoice)=>{
+        console.log(`received response ${JSON.stringify(userChoice)}`);
+        if (userChoice && userChoice.val == "yes") {
+          // this.dataToBeSent.data.filter((item)=>{
+          //   return item.Timestamp >= userChoice.timeStamp-50 && item.TimeStamp <= userChoice.timeStamp+50;
+          // }).map(item => {
+          //   console.log(`changed object: ${JSON.stringify(item)}`);
+          //   item.isMindWandered = true;
+          // });
+          console.log(`changed object size: ${this.dataToBeSent.data.length}`);
+          for(let i = 0; i < this.dataToBeSent.data.length; i++) {
+            const item = this.dataToBeSent.data[i];
+            console.log(`changed object: ${Math.abs(item.Timestamp - userChoice.timeStamp)/1000}`)
+            if (Math.abs(item.Timestamp - userChoice.timeStamp)/1000 <= 2.5) {
+              item.isMindWandered = true;
+              console.log('changed')
+            }
+          }
+
+          console.log(`changed object: ${this.dataToBeSent.data.length} ; ${this.dataToBeSent.data.filter((item)=>{
+            return item.isMindWandered;
+          }).length}`);
+        }
       })
       // eslint-disable-next-line no-undef
-      port.postMessage({message: "openModal"});
+      port.postMessage({message: "openModal", timeStamp: Date.now()});
       
       // const resposne = await chrome.tabs.sendMessage(tabs[0]?.id, {message: "openModal"});
       // console.log(`received response ${resposne}`);

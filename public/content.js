@@ -1,13 +1,13 @@
 chrome.runtime.onConnect.addListener((port) => {
     port.onMessage.addListener((msg) => {
-        console.log("hola");
+        console.log("hola"+JSON.stringify(msg));
         if (port.name == "openModal") {
             const existingModal = document.getElementById("dialog");
             try {
                 existingModal.showModal();
             } catch (error) {
                 console.log("modal isn't closed yet");
-                port.postMessage({ val: "previous" , timeStamp: Date.now() });
+                port.postMessage({ val: "previous" , timeStamp: msg.timeStamp });
             }
 
             if (existingModal == null) {
@@ -54,11 +54,11 @@ chrome.runtime.onConnect.addListener((port) => {
                     console.log("button clicked");
                     const isYesCheck = document.getElementById("input1");
                     if (isYesCheck.checked) {
-                        port.postMessage({ val: isYesCheck.value, timeStamp: Date.now() });
+                        port.postMessage({ val: isYesCheck.value, timeStamp: msg.timeStamp });
                         isYesCheck.checked = false;
                     } else {
                         const isNoCheck = document.getElementById("input2");
-                        port.postMessage({ val: isNoCheck.value, timeStamp: Date.now() });
+                        port.postMessage({ val: isNoCheck.value, timeStamp: msg.timeStamp });
                         isNoCheck.checked = false;
                     }
                     dialogBox.close();
