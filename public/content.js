@@ -45,6 +45,15 @@ chrome.runtime.onConnect.addListener((port) => {
                 divElement.appendChild(document.createElement("br"));
                 form.appendChild(divElement);
 
+
+                input1.onclick = ()=> {
+                    document.getElementById("input2").checked = false;
+                }
+                input2.onclick = ()=> {
+                    document.getElementById("input1").checked = false;
+                }
+
+
                 const button = document.createElement("button");
                 button.type = "submit";
                 button.title = "Submit";
