@@ -17,6 +17,8 @@ function App() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [gender, setGender] = useState("M");
+  const [age, setAge] = useState("")
+  const [education, setEducation] = useState("1/1, Software Engineering, BSc")
   const [doesWearGlass, setGlass] = useState("false");
   const [isFormValid, setValidity] = useState(true);
 
@@ -67,6 +69,14 @@ function App() {
     } else if (isGlass && isGlass.toLocaleLowerCase().includes("false")) {
       setGlass("false");
     }
+    const existingAge = localStorage.getItem("Age");
+    if (existingAge) {
+      setAge(existingAge);
+    }
+    const existingEducation = localStorage.getItem("Education");
+    if (existingEducation) {
+      setEducation(existingEducation);
+    }
     if (
       existingEmail == null ||
       existingEmail.length <= 0 ||
@@ -75,7 +85,9 @@ function App() {
       existingName == null ||
       existingName.length <= 0 ||
       doesWearGlass == null ||
-      doesWearGlass.length <= 0
+      doesWearGlass.length <= 0 ||
+      existingAge == null || existingAge.length == 0 ||
+      existingEducation == null || existingEducation.length == 0
     ) {
       setValidity(false);
     }
@@ -83,7 +95,7 @@ function App() {
 
   const updateEmail = (event) => {
     event.preventDefault();
-    if (!email || email == null || doesWearGlass == null || gender == null)
+    if (!email || email == null || doesWearGlass == null || gender == null || education == null || age == null)
       return;
     try {
       console.log(
@@ -97,10 +109,12 @@ function App() {
           doesWearGlass
       );
       //localStorage.removeItem("Email");
-      localStorage.setItem("Email", email);
-      localStorage.setItem("Name", name);
+      localStorage.setItem("Email", email.trim());
+      localStorage.setItem("Name", name.trim());
       localStorage.setItem("Glass", doesWearGlass);
       localStorage.setItem("Gender", gender);
+      localStorage.setItem("Age", age.trim());
+      localStorage.setItem("Education", education.trim());
       setValidity(true);
     } catch (error) {
       console.log(error);
@@ -162,6 +176,26 @@ function App() {
                     <option value="true">Yes</option>
                     <option value="false">No</option>
                   </select>
+                </label>
+                <label>
+                  Age(Years):
+                  <input
+                    type="text"
+                    name="Age"
+                    value={age ?? ""}
+                    onChange={(e) => setAge(e.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Education:
+                  <input
+                    type="text"
+                    name="Education"
+                    value={education ?? ""}
+                    onChange={(e) => setEducation(e.target.value)}
+                    required
+                  />
                 </label>
                 <input type="submit" value="Submit" />
               </form>
