@@ -16,6 +16,7 @@ class Tracking extends React.Component {
       data: null,
     };
     this.popupInterval = null;
+    this.isPrevousDataReceived = true;
     this.getDataFromLocalStorage.bind(this);
     this.startTracking.bind(this);
     this.addData.bind(this);
@@ -35,7 +36,8 @@ class Tracking extends React.Component {
     console.error(JSON.stringify(this.state));
     this.getDataFromLocalStorage();
     this.startTracking();
-    this.popupInterval = this.setRandomInterval(this.sendQueryForPopUP, 5000, 10000); 
+    //this.popupInterval = this.setRandomInterval(this.sendQueryForPopUP, 5000, 10000); 
+    this.sendPopupQuery(8000, 10000);
     this.sendNotificationForButton();
   }
   componentWillUnmount() {
@@ -44,6 +46,50 @@ class Tracking extends React.Component {
   shouldComponentUpdate() {
     return true;
   }
+
+  sendPopupQuery = (maxDelay, minDelay) => {
+    const randomTime = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;;
+    setTimeout(()=>{
+      // eslint-disable-next-line no-undef
+    chrome.tabs.query({ url: "*://meet.google.com/*"}, async(tabs) => {
+        if(tabs.length === 0) {
+          console.log("no active tab");
+          return;
+        }
+        // eslint-disable-next-line no-undef
+        const port = chrome.tabs.connect(tabs[0].id, {name: "openModal"});
+        // eslint-disable-next-line no-undef
+        port.onMessage.addListener((userChoice)=>{
+          console.log(`received response ${JSON.stringify(userChoice)}`);
+          if (userChoice && userChoice.val == "yes") {
+            console.log(`changed object size: ${this.dataToBeSent.data.length}`);
+            for(let i = 0; i < this.dataToBeSent.data.length; i++) {
+              const item = this.dataToBeSent.data[i];
+              console.log(`changed object: ${Math.abs(item.Timestamp - userChoice.timeStamp)/1000}`)
+              if (Math.abs(item.Timestamp - userChoice.timeStamp)/1000 <= 2.5) {
+                item.isMindWandered = true;
+                console.log('changed')
+              }
+            }
+
+            console.log(`changed object: ${this.dataToBeSent.data.length} ; ${this.dataToBeSent.data.filter((item)=>{
+              return item.isMindWandered;
+            }).length}`);
+            this.sendPopupQuery(15000, 15000);
+          } else {
+            this.sendPopupQuery(5000, 8000);
+          }
+          this.isPrevousDataReceived = true;
+        });
+        if (this.isPrevousDataReceived) {
+          // eslint-disable-next-line no-undef
+          port.postMessage({message: "openModal", timeStamp: Date.now()});
+          this.isPrevousDataReceived = false;
+        }
+    });
+    }, randomTime);
+  }
+
   sendNotificationForButton = () => {
     // eslint-disable-next-line no-undef
     chrome.tabs.query({url: "*://meet.google.com/*"}, async(tabs) => {
@@ -202,9 +248,13 @@ class Tracking extends React.Component {
             return item.isMindWandered;
           }).length}`);
         }
-      })
-      // eslint-disable-next-line no-undef
-      port.postMessage({message: "openModal", timeStamp: Date.now()});
+        this.isPrevousDataReceived = true;
+      });
+      if (this.isPrevousDataReceived) {
+        // eslint-disable-next-line no-undef
+        port.postMessage({message: "openModal", timeStamp: Date.now()});
+        this.isPrevousDataReceived = false;
+      }
   });
   }
   sendDataToBackend=()=> {
