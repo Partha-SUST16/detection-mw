@@ -132,73 +132,101 @@ function App() {
             {!isOnMeet && <p>You are not in meet.google.com</p>}
 
             {isOnMeet && (
-              <form onSubmit={updateEmail}>
-                <label>
+              <form onSubmit={updateEmail} className="form">
+              <div className="form-group">
+                <label htmlFor="name" className="form-label">
                   Name:
-                  <input
-                    type="text"
-                    name="name"
-                    value={name ?? ""}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                  />
                 </label>
-                <label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={name ?? ""}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="form-control"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">
                   Email:
-                  <input
-                    type="email"
-                    name="Email"
-                    value={email ?? ""}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
                 </label>
-                <label>
-                  {" "}
+                <input
+                  type="email"
+                  name="Email"
+                  id="email"
+                  value={email ?? ""}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="form-control"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="gender" className="form-label">
                   Gender:
-                  <select
-                    value={gender ?? ""}
-                    onChange={(e) => setGender(e.target.value)}
-                    required
-                  >
-                    <option value="M">Male</option>
-                    <option value="F">Female</option>
-                  </select>
                 </label>
-                <label>
-                  {" "}
-                  Do you wear glass:
-                  <select
-                    value={doesWearGlass ?? ""}
-                    onChange={(e) => setGlass(e.target.value)}
-                    required
-                  >
-                    <option value="true">Yes</option>
-                    <option value="false">No</option>
-                  </select>
+                <select
+                  id="gender"
+                  value={gender ?? ""}
+                  onChange={(e) => setGender(e.target.value)}
+                  required
+                  className="form-control"
+                >
+                  <option value="">--Please select--</option>
+                  <option value="M">Male</option>
+                  <option value="F">Female</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="glass" className="form-label">
+                  Do you wear glasses?
                 </label>
-                <label>
-                  Age(Years):
-                  <input
-                    type="text"
-                    name="Age"
-                    value={age ?? ""}
-                    onChange={(e) => setAge(e.target.value)}
-                    required
-                  />
+                <select
+                  id="glass"
+                  value={doesWearGlass ?? ""}
+                  onChange={(e) => setGlass(e.target.value)}
+                  required
+                  className="form-control"
+                >
+                  <option value="">--Please select--</option>
+                  <option value="true">Yes</option>
+                  <option value="false">No</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="age" className="form-label">
+                  Age (Years):
                 </label>
-                <label>
+                <input
+                  type="text"
+                  name="Age"
+                  id="age"
+                  value={age ?? ""}
+                  onChange={(e) => setAge(e.target.value)}
+                  required
+                  className="form-control"
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="education" className="form-label">
                   Education:
-                  <input
-                    type="text"
-                    name="Education"
-                    value={education ?? ""}
-                    onChange={(e) => setEducation(e.target.value)}
-                    required
-                  />
                 </label>
-                <input type="submit" value="Submit" />
-              </form>
+                <textarea
+                  name="Education"
+                  id="education"
+                  value={education ?? ""}
+                  onChange={(e) => setEducation(e.target.value)}
+                  required
+                  rows="5"
+                  style={{height: "auto"}}
+                  className="form-control"
+                />
+              </div>
+              <button type="submit" className="btn btn-primary">
+                Submit
+              </button>
+            </form>
+            
             )}
             {isOnMeet && isFormValid && (
               <>
