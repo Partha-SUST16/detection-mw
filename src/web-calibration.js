@@ -12,6 +12,7 @@ class WebCalibration extends React.Component {
   CalibrationPoints = {};
   state = {
     openModal: false,
+    existingAccuracy: 0.0,
   };
   
   routeToTrack = () => {
@@ -67,6 +68,9 @@ class WebCalibration extends React.Component {
         canvas.style.position = "fixed";
       }
     };
+    if (localStorage.getItem("Accuracy") != null || localStorage.getItem("Accuracy") != undefined) {
+      this.setState({existingAccuracy: parseFloat(localStorage.getItem("Accuracy"))});
+    }
     setup();
     this.extraSetup();
   }
@@ -209,6 +213,7 @@ class WebCalibration extends React.Component {
           }).then((isConfirm) => {
             if (isConfirm) {
               //clear the calibration & hide the last middle button
+              localStorage.setItem("Accuracy", precision_measurement);
               this.ClearCanvas();
               this.routeToTrack();
             } else {

@@ -21,6 +21,7 @@ function App() {
   const [education, setEducation] = useState("1/1, Software Engineering, BSc")
   const [doesWearGlass, setGlass] = useState("false");
   const [isFormValid, setValidity] = useState(true);
+  const [existingAccuracy, setExistingAcuraccy] = useState(0.0);
 
   useEffect(() => {
     const queryInfo = { active: true, currentWindow: true };
@@ -76,6 +77,9 @@ function App() {
     const existingEducation = localStorage.getItem("Education");
     if (existingEducation) {
       setEducation(existingEducation);
+    }
+    if (localStorage.getItem("Accuracy") != null || localStorage.getItem("Accuracy") != undefined) {
+       setExistingAcuraccy(parseFloat(localStorage.getItem("Accuracy")));
     }
     if (
       existingEmail == null ||
@@ -235,10 +239,10 @@ function App() {
                     Calibration
                   </Link>
                 </button>
-                <button>
-                  <Link target={"_blank"} to="/track">
+                <button disabled={existingAccuracy < 50}>
+                  {existingAccuracy < 50 ? "Acuraccy should be minimum 50%":<Link target={"_blank"} to="/track">
                     Start Tracking
-                  </Link>
+                  </Link>}
                 </button>
               </>
             )}
@@ -246,7 +250,7 @@ function App() {
         )}
         <Routes>
           <Route path="/calibration" element={<WebCalibration />} />
-          <Route path="/track" element={<Tracking />} />
+          <Route  path="/track" element={<Tracking />} />
         </Routes>
       </Router>
     </div>
