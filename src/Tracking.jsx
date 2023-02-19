@@ -33,7 +33,7 @@ class Tracking extends React.Component {
     this.dataToBeSent.data = [];
   }
   async componentDidMount() {
-    console.error(JSON.stringify(this.state));
+    // console.error(JSON.stringify(this.state));
     this.getDataFromLocalStorage();
     this.startTracking();
     //this.popupInterval = this.setRandomInterval(this.sendQueryForPopUP, 5000, 10000); 
@@ -93,7 +93,7 @@ class Tracking extends React.Component {
   sendNotificationForButton = () => {
     // eslint-disable-next-line no-undef
     chrome.tabs.query({url: "*://meet.google.com/*"}, async(tabs) => {
-        console.error(JSON.stringify(tabs));
+        // console.error(JSON.stringify(tabs));
         if(tabs.length === 0) {
           console.log("no active tab");
           return;
