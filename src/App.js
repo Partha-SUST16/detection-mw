@@ -120,10 +120,43 @@ function App() {
       localStorage.setItem("Age", age.trim());
       localStorage.setItem("Education", education.trim());
       setValidity(true);
+      postIdentificationDataToServer();
     } catch (error) {
       console.log(error);
     }
   };
+
+  const postIdentificationDataToServer = async()=>{
+    const requestBode = {
+      "name": name,
+      "email": email,
+      "gender": gender,
+      "useGlass": doesWearGlass=="true",
+      "age": age,
+      "education": education,
+      "displayWidth": window.screen.width,
+      "displayHeight": window.screen.height
+    };
+    try {
+      await fetch("http://20.198.68.124:8080/students", {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBode)
+      }).then( async (res) => {
+        if (res && res.ok)
+        {
+          const resposne = await res.json();
+          const userId = resposne.id;
+          localStorage.setItem("UserId", userId);
+        }
+      })
+    } catch (error) {
+      
+    }
+  }
 
   return (
     <div className="App">

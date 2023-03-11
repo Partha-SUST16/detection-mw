@@ -14,6 +14,7 @@ class Tracking extends React.Component {
       gender: "",
       doesWearGlass: "",
       data: null,
+      userId: null
     };
     this.popupInterval = null;
     this.isPrevousDataReceived = true;
@@ -26,19 +27,20 @@ class Tracking extends React.Component {
     const existingName = localStorage.getItem("Name");
     const existingGender = localStorage.getItem("Gender");
     const isGlass = localStorage.getItem("Glass");
+    const userId = parseInt(localStorage.getItem("UserId"));
     this.dataToBeSent.email = existingEmail;
     this.dataToBeSent.name = existingName;
     this.dataToBeSent.gender = existingGender;
     this.dataToBeSent.doesWearGlass = isGlass;
+    this.dataToBeSent.userId = userId;
     this.dataToBeSent.data = [];
   }
   async componentDidMount() {
-    // console.error(JSON.stringify(this.state));
     this.getDataFromLocalStorage();
     this.startTracking();
-    //this.popupInterval = this.setRandomInterval(this.sendQueryForPopUP, 5000, 10000); 
-    this.sendPopupQuery(8000, 10000);
+    this.sendPopupQuery(28000, 30000);
     this.sendNotificationForButton();
+    this.sendDataToBackend();
   }
   componentWillUnmount() {
     this.popupInterval?.clear();
@@ -75,9 +77,9 @@ class Tracking extends React.Component {
             console.log(`changed object: ${this.dataToBeSent.data.length} ; ${this.dataToBeSent.data.filter((item)=>{
               return item.isMindWandered;
             }).length}`);
-            this.sendPopupQuery(15000, 15000);
+            this.sendPopupQuery(30000, 30000);
           } else {
-            this.sendPopupQuery(5000, 8000);
+            this.sendPopupQuery(25000, 28000);
           }
           this.isPrevousDataReceived = true;
         });
@@ -93,7 +95,6 @@ class Tracking extends React.Component {
   sendNotificationForButton = () => {
     // eslint-disable-next-line no-undef
     chrome.tabs.query({url: "*://meet.google.com/*"}, async(tabs) => {
-        // console.error(JSON.stringify(tabs));
         if(tabs.length === 0) {
           console.log("no active tab");
           return;
@@ -106,10 +107,8 @@ class Tracking extends React.Component {
             console.log(`changed object size: ${this.dataToBeSent.data.length}`);
             for(let i = 0; i < this.dataToBeSent.data.length; i++) {
               const item = this.dataToBeSent.data[i];
-              // console.log(`changed object: ${Math.abs(item.Timestamp - userChoice.timeStamp)/1000}`)
               if (Math.abs(item.Timestamp - userChoice.timeStamp)/1000 <= 2.5) {
                 item.isMindWandered = true;
-                // console.log('changed')
               }
             }
 
@@ -141,7 +140,6 @@ class Tracking extends React.Component {
   startTracking() {
     const self = this;
     try {
-      //this.sendDataToBackend();
       webgazer
         .setRegression("ridge")
         .setGazeListener(function (data, elapsedTime) {
@@ -150,9 +148,7 @@ class Tracking extends React.Component {
           }
           let timeStamp = Date.now();
           let dataText = `${data.x},${data.y},${timeStamp}`;
-          //Timestamp	StimulusName  EventSource	GazeX GazeY GazeLeftx	GazeRightx	GazeLefty	GazeRighty	PupilLeft	PupilRight	FixationSeq	SaccadeSeq	Blink	GazeAOI
           try {
-            //console.log(JSON.stringify(data));
             if (data.eyeFeatures.left.blink) {
               dataText = `${timeStamp},'stimulus_0','ET',${data.x},${data.y},${
                 data.gazeLeft.x
@@ -191,9 +187,10 @@ class Tracking extends React.Component {
     obj.FixationSeq = -1;
     obj.SaccadeSeq = -1;
     obj.Blink = 1;
-    obj.student_id = 1;
+    obj.student_id = this.dataToBeSent.userId;
     obj.GazeAOI = -1;
     obj.isMindWandered = false;
+    obj.batchNo = 0;
     if (!data.eyeFeatures.left.blink) {
       obj.PupilLeft = data.eyeFeatures.left.pupil[1];
       obj.PupilRight = data.eyeFeatures.right.pupil[1];
@@ -260,19 +257,21 @@ class Tracking extends React.Component {
   sendDataToBackend=()=> {
     setInterval(async () => {
       try {
-        await fetch("https://2716-27-147-234-160.in.ngrok.io/gaze", {
-          method: "POST",
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-          },
-          body: JSON.stringify(this.dataToBeSent.data),
-        }).then((res) => {
-          console.log(res);
-          if (res.ok)
-            this.dataToBeSent.data = [];
-        });
+       if (this.state.isPaused == false)
+       {
+          await fetch("http://20.198.68.124:8080/gaze", {
+            method: "POST",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(this.dataToBeSent.data),
+          }).then((res) => {
+            console.log(res);
+            if (res.ok)
+              this.dataToBeSent.data = [];
+          });
+       }
 
       } catch (error) {
         console.log(error);
