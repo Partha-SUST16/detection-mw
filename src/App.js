@@ -159,6 +159,7 @@ function App() {
           const resposne = await res.json();
           const userId = resposne.id;
           localStorage.setItem("UserId", userId);
+          window.alert("Registration Successful");
         }
       })
     } catch (error) {
