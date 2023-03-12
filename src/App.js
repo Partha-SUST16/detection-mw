@@ -21,6 +21,7 @@ function App() {
   const [education, setEducation] = useState("1/1, Software Engineering, BSc")
   const [doesWearGlass, setGlass] = useState("false");
   const [isFormValid, setValidity] = useState(true);
+  const [isCalibrated, setIsCalibrated] = useState(false);
   const [existingAccuracy, setExistingAcuraccy] = useState(0.0);
 
   useEffect(() => {
@@ -80,6 +81,7 @@ function App() {
     }
     if (localStorage.getItem("Accuracy") != null || localStorage.getItem("Accuracy") != undefined) {
        setExistingAcuraccy(parseFloat(localStorage.getItem("Accuracy")));
+       setIsCalibrated(true);
     }
     if (
       existingEmail == null ||
@@ -91,7 +93,8 @@ function App() {
       doesWearGlass == null ||
       doesWearGlass.length <= 0 ||
       existingAge == null || existingAge.length == 0 ||
-      existingEducation == null || existingEducation.length == 0
+      existingEducation == null || existingEducation.length == 0 || 
+      isCalibrated == false
     ) {
       setValidity(false);
     }
@@ -113,6 +116,10 @@ function App() {
           doesWearGlass
       );
       //localStorage.removeItem("Email");
+      if (localStorage.getItem("Accuracy") == null || localStorage.getItem("Accuracy") == undefined)
+      {
+        window.alert("Calibration required");
+      }
       localStorage.setItem("Email", email.trim());
       localStorage.setItem("Name", name.trim());
       localStorage.setItem("Glass", doesWearGlass);
@@ -135,7 +142,8 @@ function App() {
       "age": age,
       "education": education,
       "displayWidth": window.screen.width,
-      "displayHeight": window.screen.height
+      "displayHeight": window.screen.height,
+      "accuracy": parseFloat(localStorage.getItem("Accuracy") ? localStorage.getItem("Accuracy") : "0.0")
     };
     try {
       await fetch("http://20.198.68.124:8080/students", {
@@ -265,7 +273,7 @@ function App() {
             </form>
             
             )}
-            {isOnMeet && isFormValid && (
+            {isOnMeet && (
               <>
                 <button>
                   <Link target={"_blank"} to="/calibration">
