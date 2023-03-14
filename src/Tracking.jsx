@@ -38,7 +38,7 @@ class Tracking extends React.Component {
   async componentDidMount() {
     this.getDataFromLocalStorage();
     this.startTracking();
-    this.sendPopupQuery(28000, 30000);
+    this.sendPopupQuery(50000, 60000);
     this.sendNotificationForButton();
     this.sendDataToBackend();
   }
@@ -68,7 +68,7 @@ class Tracking extends React.Component {
             for(let i = 0; i < this.dataToBeSent.data.length; i++) {
               const item = this.dataToBeSent.data[i];
               console.log(`changed object: ${Math.abs(item.Timestamp - userChoice.timeStamp)/1000}`)
-              if (Math.abs(item.Timestamp - userChoice.timeStamp)/1000 <= 2.5) {
+              if (Math.abs(item.Timestamp - userChoice.timeStamp)/1000 <= 3.0) {
                 item.isMindWandered = true;
                 console.log('changed')
               }
@@ -77,9 +77,9 @@ class Tracking extends React.Component {
             console.log(`changed object: ${this.dataToBeSent.data.length} ; ${this.dataToBeSent.data.filter((item)=>{
               return item.isMindWandered;
             }).length}`);
-            this.sendPopupQuery(30000, 30000);
+            this.sendPopupQuery(80000, 90000);
           } else {
-            this.sendPopupQuery(25000, 28000);
+            this.sendPopupQuery(85000, 90000);
           }
           this.isPrevousDataReceived = true;
         });
@@ -107,7 +107,7 @@ class Tracking extends React.Component {
             console.log(`changed object size: ${this.dataToBeSent.data.length}`);
             for(let i = 0; i < this.dataToBeSent.data.length; i++) {
               const item = this.dataToBeSent.data[i];
-              if (Math.abs(item.Timestamp - userChoice.timeStamp)/1000 <= 2.5) {
+              if (Math.abs(item.Timestamp - userChoice.timeStamp)/1000 <= 3.0) {
                 item.isMindWandered = true;
               }
             }

@@ -119,6 +119,7 @@ function App() {
       if (localStorage.getItem("Accuracy") == null || localStorage.getItem("Accuracy") == undefined)
       {
         window.alert("Calibration required");
+        return;
       }
       localStorage.setItem("Email", email.trim());
       localStorage.setItem("Name", name.trim());
