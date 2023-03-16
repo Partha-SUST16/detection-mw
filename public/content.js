@@ -79,10 +79,13 @@ chrome.runtime.onConnect.addListener((port) => {
         form.appendChild(button);
 
         dialogBox.appendChild(form);
-
-        const body = document.getElementsByTagName("body");
-        body[0].appendChild(dialogBox);
-
+        if (document.getElementsByClassName("Qp8KI").length > 0) {
+          const firstChild = document.getElementsByClassName("Qp8KI")[0];
+          firstChild.append(dialogBox);
+        } else {
+          const body = document.getElementsByTagName("body");
+          body[0].appendChild(dialogBox);
+        }
         dialogBox.showModal();
       }
     }
@@ -93,7 +96,6 @@ chrome.runtime.onConnect.addListener((port) => {
         formContainer.id = "test";
         formContainer.style.position = "fixed";
         formContainer.style.bottom = "20px";
-        formContainer.style.right = "20px";
         formContainer.style.backgroundColor = "white";
         formContainer.style.borderRadius = "10px";
         formContainer.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
@@ -113,14 +115,21 @@ chrome.runtime.onConnect.addListener((port) => {
         // Add event listener for button click
         button.addEventListener("click", () => {
           console.log("Button clicked!");
-          port.postMessage({timeStamp: Date.now()});
+          port.postMessage({ timeStamp: Date.now() });
         });
 
         // Add the button to the form container
         formContainer.appendChild(button);
-
+        if (document.getElementsByClassName("Qp8KI").length > 0) {
+          const firstChild = document.getElementsByClassName("Qp8KI")[0];
+          firstChild.append(formContainer);
+        }
         // Add the div to the document
-        document.getElementsByTagName("body")[0].appendChild(formContainer);
+        else {
+          formContainer.style.right = "20px";
+
+          document.getElementsByTagName("body")[0].appendChild(formContainer);
+        }
       }
     }
   });
