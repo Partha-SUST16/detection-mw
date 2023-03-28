@@ -162,9 +162,13 @@ function App() {
           localStorage.setItem("UserId", userId);
           window.alert("Registration Successful");
         }
+        else 
+        {
+          window.alert("Something went wrong!");
+        }
       })
     } catch (error) {
-      
+      window.alert("Something went wrong!");
     }
   }
 
