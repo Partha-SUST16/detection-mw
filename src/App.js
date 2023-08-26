@@ -24,34 +24,6 @@ function App() {
   const [isCalibrated, setIsCalibrated] = useState(false);
   const [existingAccuracy, setExistingAcuraccy] = useState(0.0);
 
-  // useEffect(() => {
-  //   const queryInfo = { active: true, currentWindow: true };
-  //   // eslint-disable-next-line no-undef
-  //   chrome.tabs && chrome.tabs.query(queryInfo, (tabs) => {
-  //       if (tabs) {
-  //         const url = tabs[0].url;
-  //         setUri(url);
-  //         if (url && url.includes("meet.google.com")) {
-  //           setIsOnMeet(true);
-  //           console.log(`is on meet.com ${true}`);
-  //         }
-  //         if (url && (url.includes("calibration") || url.includes("track"))) {
-  //           setisOnCalibrationPage(true);
-  //           console.log(`is on meet.com ${false}`);
-  //         }
-  //         // if(url && url.includes("meet.google.com")) {
-  //         //   console.log('message')
-  //         //   // eslint-disable-next-line no-undef
-
-  //         // }
-  //       }
-  //     });
-  //   // eslint-disable-next-line no-undef
-  //   if (!chrome.tabs) {
-  //     setisOnCalibrationPage(true);
-  //   }
-
-  // }, []);
   useEffect(() => {
     // eslint-disable-next-line no-undef
     chrome.tabs?.query({ active: true, currentWindow: true }, ([{ url }]) => {
@@ -66,54 +38,7 @@ function App() {
       setisOnCalibrationPage(true);
     }
   }, []);
-  // useEffect(() => {
-  //   const existingEmail = localStorage.getItem("Email");
-  //   if (existingEmail) {
-  //     setEmail(existingEmail);
-  //   }
-  //   const existingName = localStorage.getItem("Name");
-  //   if (existingName) {
-  //     setName(existingName);
-  //   }
-  //   const existingGender = localStorage.getItem("Gender");
-  //   if (existingGender) {
-  //     setGender(existingGender);
-  //   }
-  //   const isGlass = localStorage.getItem("Glass");
-  //   if (isGlass && isGlass.toLocaleLowerCase().includes("true")) {
-  //     setGlass("true");
-  //   } else if (isGlass && isGlass.toLocaleLowerCase().includes("false")) {
-  //     setGlass("false");
-  //   }
-  //   const existingAge = localStorage.getItem("Age");
-  //   if (existingAge) {
-  //     setAge(existingAge);
-  //   }
-  //   const existingEducation = localStorage.getItem("Education");
-  //   if (existingEducation) {
-  //     setEducation(existingEducation);
-  //   }
-  //   if (localStorage.getItem("Accuracy") != null || localStorage.getItem("Accuracy") != undefined) {
-  //      setExistingAcuraccy(parseFloat(localStorage.getItem("Accuracy")));
-  //      setIsCalibrated(true);
-  //   }
-  //   if (
-  //     existingEmail == null ||
-  //     existingEmail.length <= 0 ||
-  //     existingGender == null ||
-  //     existingGender.length <= 0 ||
-  //     existingName == null ||
-  //     existingName.length <= 0 ||
-  //     doesWearGlass == null ||
-  //     doesWearGlass.length <= 0 ||
-  //     existingAge == null || existingAge.length == 0 ||
-  //     existingEducation == null || existingEducation.length == 0 ||
-  //     isCalibrated == false
-  //   ) {
-  //     setValidity(false);
-  //   }
-  // }, []);
-
+ 
   const getItemFromLocalStorage = (key) => {
     const item = localStorage.getItem(key);
     return item ? item : null;
@@ -225,11 +150,12 @@ function App() {
       ),
     };
     try {
-      await fetch("http://20.198.68.124:8080/students", {
+      await fetch("http://20.197.16.87:8080/students", {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
+          "Access-Control-Allow-Origin" : '*'
         },
         body: JSON.stringify(requestBode),
       }).then(async (res) => {

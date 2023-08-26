@@ -38,8 +38,8 @@ class Tracking extends React.Component {
   async componentDidMount() {
     this.getDataFromLocalStorage();
     this.startTracking();
-    this.sendPopupQuery(50000, 60000);
-    this.sendNotificationForButton();
+    // this.sendPopupQuery(50000, 60000);
+    // this.sendNotificationForButton();
     this.sendDataToBackend();
   }
   componentWillUnmount() {
@@ -259,7 +259,7 @@ class Tracking extends React.Component {
       try {
        if (this.state.isPaused == false)
        {
-          await fetch("http://20.198.68.124:8080/gaze", {
+          await fetch("http://20.197.16.87:8080/gaze", {
             method: "POST",
             headers: {
               'Accept': 'application/json',
